@@ -2,100 +2,569 @@
 <html lang="zh">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>幸运大转盘</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
-    body { text-align: center; font-family: sans-serif; }
-    #pointer {
-      width: 0; height: 0;
-      border-left: 15px solid transparent;
-      border-right: 15px solid transparent;
-      border-bottom: 30px solid red;
-      margin: 20px auto;
+    :root {
+      --primary-color: #ff4757;
+      --secondary-color: #5352ed;
+      --accent-color: #ffa502;
+      --light-color: #f1f2f6;
+      --dark-color: #2f3542;
+      --success-color: #2ed573;
     }
-    canvas { border-radius: 50%; }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: #fff;
+      min-height: 100vh;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .container {
+      max-width: 1000px;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    
+    header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    
+    h1 {
+      font-size: 2.8rem;
+      margin-bottom: 10px;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    }
+    
+    .subtitle {
+      font-size: 1.2rem;
+      opacity: 0.9;
+    }
+    
+    .main-content {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 40px;
+      width: 100%;
+    }
+    
+    .wheel-container {
+      position: relative;
+      width: 400px;
+      height: 400px;
+    }
+    
+    #wheel {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+      transition: transform 0.1s;
+    }
+    
+    #pointer {
+      position: absolute;
+      top: -30px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 40px;
+      height: 50px;
+      z-index: 10;
+      filter: drop-shadow(0 0 5px rgba(0, 0, 0, 0.5));
+    }
+    
+    #pointer::before {
+      content: '';
+      position: absolute;
+      width: 0;
+      height: 0;
+      border-left: 20px solid transparent;
+      border-right: 20px solid transparent;
+      border-bottom: 50px solid var(--primary-color);
+    }
+    
+    .controls {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+      width: 400px;
+    }
+    
+    #spin-btn {
+      background: var(--primary-color);
+      color: white;
+      border: none;
+      padding: 15px 40px;
+      font-size: 1.2rem;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: all 0.3s;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    #spin-btn:hover {
+      background: #ff6b81;
+      transform: translateY(-3px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+    }
+    
+    #spin-btn:active {
+      transform: translateY(1px);
+    }
+    
+    #spin-btn:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+    
+    .result-container {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      padding: 20px;
+      border-radius: 15px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+    
+    #result {
+      font-size: 1.5rem;
+      font-weight: bold;
+      min-height: 2rem;
+      color: var(--accent-color);
+      margin-top: 10px;
+    }
+    
+    .config-panel {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      padding: 20px;
+      border-radius: 15px;
+      width: 100%;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+    
+    .config-panel h3 {
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    #prizesInput {
+      width: 100%;
+      min-height: 120px;
+      padding: 12px;
+      border-radius: 8px;
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      font-size: 1rem;
+      margin-bottom: 15px;
+    }
+    
+    #prizesInput:focus {
+      outline: none;
+      border-color: var(--secondary-color);
+    }
+    
+    .buttons {
+      display: flex;
+      gap: 10px;
+    }
+    
+    button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-weight: bold;
+    }
+    
+    .btn-primary {
+      background: var(--secondary-color);
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      background: #3742fa;
+    }
+    
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.2);
+      color: white;
+    }
+    
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+    
+    .history-panel {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      padding: 20px;
+      border-radius: 15px;
+      width: 100%;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      margin-top: 20px;
+    }
+    
+    .history-list {
+      max-height: 200px;
+      overflow-y: auto;
+      margin-top: 15px;
+    }
+    
+    .history-item {
+      padding: 10px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      justify-content: space-between;
+    }
+    
+    .history-item:last-child {
+      border-bottom: none;
+    }
+    
+    .confetti {
+      position: fixed;
+      width: 10px;
+      height: 10px;
+      background-color: var(--accent-color);
+      opacity: 0;
+      pointer-events: none;
+    }
+    
+    @media (max-width: 900px) {
+      .main-content {
+        flex-direction: column;
+        align-items: center;
+      }
+      
+      .wheel-container, .controls {
+        width: 100%;
+        max-width: 400px;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      h1 {
+        font-size: 2.2rem;
+      }
+      
+      .wheel-container {
+        width: 320px;
+        height: 320px;
+      }
+    }
   </style>
 </head>
 <body>
-  <h1>🎯 幸运大转盘</h1>
-  <div id="pointer"></div>
-  <canvas id="wheel" width="400" height="400"></canvas><br>
-  <button onclick="spin()">开始抽奖</button>
-
-  <h3>奖品配置</h3>
-  <textarea id="prizesInput" rows="6" cols="30"></textarea><br>
-  <button onclick="savePrizes()">保存配置</button>
-
-  <p id="result"></p>
+  <div class="container">
+    <header>
+      <h1><i class="fas fa-dharmachakra"></i> 幸运大转盘</h1>
+      <p class="subtitle">转动幸运，收获惊喜！</p>
+    </header>
+    
+    <div class="main-content">
+      <div class="wheel-container">
+        <div id="pointer"></div>
+        <canvas id="wheel" width="400" height="400"></canvas>
+      </div>
+      
+      <div class="controls">
+        <button id="spin-btn" onclick="spin()">
+          <i class="fas fa-redo"></i> 开始抽奖
+        </button>
+        
+        <div class="result-container">
+          <h3>抽奖结果</h3>
+          <p id="result">等待抽奖...</p>
+        </div>
+        
+        <div class="config-panel">
+          <h3><i class="fas fa-cog"></i> 奖品配置</h3>
+          <textarea id="prizesInput" placeholder="每行输入一个奖品&#10;例如：&#10;一等奖：iPhone&#10;二等奖：AirPods&#10;谢谢参与"></textarea>
+          <div class="buttons">
+            <button class="btn-primary" onclick="savePrizes()">保存配置</button>
+            <button class="btn-secondary" onclick="resetPrizes()">恢复默认</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="history-panel">
+      <h3><i class="fas fa-history"></i> 抽奖历史</h3>
+      <div class="history-list" id="historyList">
+        <!-- 历史记录将在这里显示 -->
+      </div>
+    </div>
+  </div>
 
   <script>
     const canvas = document.getElementById("wheel");
     const ctx = canvas.getContext("2d");
-    let result = document.getElementById("result");
-    let prizesInput = document.getElementById("prizesInput");
+    const resultElement = document.getElementById("result");
+    const prizesInput = document.getElementById("prizesInput");
+    const spinBtn = document.getElementById("spin-btn");
+    const historyList = document.getElementById("historyList");
 
     // 默认奖品
-    let prizes = ["奖品1", "奖品2", "奖品3", "奖品4", "奖品5", "奖品6"];
+    let prizes = ["一等奖", "二等奖", "三等奖", "四等奖", "五等奖", "六等奖"];
+    let currentRotation = 0;
+    let isSpinning = false;
+    let spinHistory = [];
 
-    // 从本地读取配置
+    // 从本地存储读取配置和历史
     if(localStorage.getItem("prizes")){
       prizes = JSON.parse(localStorage.getItem("prizes"));
-      prizesInput.value = prizes.join("\n");
-    } else {
-      prizesInput.value = prizes.join("\n");
     }
+    
+    if(localStorage.getItem("spinHistory")){
+      spinHistory = JSON.parse(localStorage.getItem("spinHistory"));
+      updateHistoryDisplay();
+    }
+    
+    prizesInput.value = prizes.join("\n");
 
-    let currentRotation = 0;
+    // 颜色方案
+    const colors = [
+      "#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0", 
+      "#9966FF", "#FF9F40", "#FF6384", "#C9CBCF"
+    ];
 
     function drawWheel() {
-      let num = prizes.length;
-      let anglePer = 2 * Math.PI / num;
-      let colors = ["#ff7675","#74b9ff","#55efc4","#ffeaa7","#fd79a8","#a29bfe","#fab1a0","#81ecec"];
+      const num = prizes.length;
+      const anglePer = 2 * Math.PI / num;
+      const centerX = canvas.width / 2;
+      const centerY = canvas.height / 2;
+      const radius = canvas.width / 2;
 
-      ctx.clearRect(0,0,400,400);
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      for(let i=0;i<num;i++){
-        // 扇区颜色
+      // 绘制转盘背景
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
+      ctx.fillStyle = "rgba(255, 255, 255, 0.1)";
+      ctx.fill();
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = "rgba(255, 255, 255, 0.3)";
+      ctx.stroke();
+
+      // 绘制每个扇区
+      for(let i = 0; i < num; i++){
         ctx.beginPath();
-        ctx.moveTo(200,200);
+        ctx.moveTo(centerX, centerY);
+        ctx.arc(centerX, centerY, radius, i * anglePer, (i + 1) * anglePer);
+        ctx.closePath();
         ctx.fillStyle = colors[i % colors.length];
-        ctx.arc(200,200,200,i*anglePer,(i+1)*anglePer);
         ctx.fill();
+        ctx.stroke();
 
-        // 奖品文字
+        // 绘制奖品文字
         ctx.save();
-        ctx.translate(200,200);
-        ctx.rotate(i*anglePer + anglePer/2);
-        ctx.textAlign="right";
-        ctx.fillStyle="#000";
-        ctx.font="16px sans-serif";
-        ctx.fillText(prizes[i], 180, 5);
+        ctx.translate(centerX, centerY);
+        ctx.rotate(i * anglePer + anglePer / 2);
+        ctx.textAlign = "right";
+        ctx.fillStyle = "#fff";
+        ctx.font = "bold 16px sans-serif";
+        ctx.fillText(prizes[i], radius - 20, 5);
         ctx.restore();
       }
+
+      // 绘制中心圆
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, 15, 0, 2 * Math.PI);
+      ctx.fillStyle = "#fff";
+      ctx.fill();
+      ctx.strokeStyle = "#ddd";
+      ctx.lineWidth = 2;
+      ctx.stroke();
     }
 
     function spin(){
-      let rand = Math.floor(Math.random() * prizes.length);
-      let degPerPrize = 360 / prizes.length;
-      let stopAngle = 360 - (rand * degPerPrize + degPerPrize/2);
-
-      currentRotation += 360*5 + stopAngle; // 多转几圈
-      canvas.style.transition = "transform 4s ease-out";
+      if (isSpinning) return;
+      
+      isSpinning = true;
+      spinBtn.disabled = true;
+      resultElement.textContent = "抽奖中...";
+      
+      // 随机选择奖品
+      const randomIndex = Math.floor(Math.random() * prizes.length);
+      const degPerPrize = 360 / prizes.length;
+      const stopAngle = 360 - (randomIndex * degPerPrize + degPerPrize / 2);
+      
+      // 多转几圈增加动画效果
+      currentRotation += 360 * 5 + stopAngle;
+      
+      // 应用旋转动画
+      canvas.style.transition = "transform 4s cubic-bezier(0.17, 0.67, 0.21, 0.99)";
       canvas.style.transform = `rotate(${currentRotation}deg)`;
-
-      setTimeout(()=>{
-        result.textContent = "结果：" + prizes[rand];
+      
+      // 添加音效（简单版本）
+      const spinSound = new Audio("data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF5fdJivrJBhNjVgodDbq2EcBStztvLNjEMTACRuve/IfDULAB1sv/LMeC8JABlqvfLNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMAB极简版音效，实际应用中可替换为真实音效");
+      spinSound.play();
+      
+      // 显示结果
+      setTimeout(() => {
+        const prize = prizes[randomIndex];
+        resultElement.textContent = prize;
+        resultElement.style.fontSize = "1.8rem";
+        resultElement.style.color = "#ffdd59";
+        
+        // 添加到历史记录
+        addToHistory(prize);
+        
+        // 创建庆祝效果
+        createConfetti();
+        
+        isSpinning = false;
+        spinBtn.disabled = false;
       }, 4000);
     }
 
     function savePrizes(){
-      prizes = prizesInput.value.split("\n").filter(x=>x.trim()!="");
+      const lines = prizesInput.value.split("\n").filter(x => x.trim() !== "");
+      if (lines.length < 2) {
+        alert("请至少输入两个奖品！");
+        return;
+      }
+      
+      prizes = lines;
       localStorage.setItem("prizes", JSON.stringify(prizes));
       drawWheel();
-      alert("配置已保存！");
+      
+      // 显示保存成功提示
+      const saveBtn = document.querySelector('.btn-primary');
+      const originalText = saveBtn.textContent;
+      saveBtn.textContent = "保存成功！";
+      saveBtn.style.background = "var(--success-color)";
+      
+      setTimeout(() => {
+        saveBtn.textContent = originalText;
+        saveBtn.style.background = "";
+      }, 1500);
+    }
+
+    function resetPrizes() {
+      prizes = ["一等奖", "二等奖", "三等奖", "四等奖", "五等奖", "六等奖"];
+      prizesInput.value = prizes.join("\n");
+      localStorage.setItem("prizes", JSON.stringify(prizes));
+      drawWheel();
+      
+      // 显示重置成功提示
+      const resetBtn = document.querySelector('.btn-secondary');
+      const originalText = resetBtn.textContent;
+      resetBtn.textContent = "已重置！";
+      resetBtn.style.background = "var(--success-color)";
+      
+      setTimeout(() => {
+        resetBtn.textContent = originalText;
+        resetBtn.style.background = "";
+      }, 1500);
+    }
+
+    function addToHistory(prize) {
+      const now = new Date();
+      const timeString = now.toLocaleTimeString();
+      
+      spinHistory.unshift({
+        prize: prize,
+        time: timeString
+      });
+      
+      // 只保留最近10条记录
+      if (spinHistory.length > 10) {
+        spinHistory.pop();
+      }
+      
+      localStorage.setItem("spinHistory", JSON.stringify(spinHistory));
+      updateHistoryDisplay();
+    }
+
+    function updateHistoryDisplay() {
+      historyList.innerHTML = "";
+      
+      if (spinHistory.length === 0) {
+        historyList.innerHTML = "<div class='history-item'>暂无记录</div>";
+        return;
+      }
+      
+      spinHistory.forEach(item => {
+        const historyItem = document.createElement("div");
+        historyItem.className = "history-item";
+        historyItem.innerHTML = `
+          <span>${item.prize}</span>
+          <span>${item.time}</span>
+        `;
+        historyList.appendChild(historyItem);
+      });
+    }
+
+    function createConfetti() {
+      const confettiCount = 100;
+      const container = document.body;
+      
+      for (let i = 0; i < confettiCount; i++) {
+        const confetti = document.createElement("div");
+        confetti.className = "confetti";
+        
+        const color = colors[Math.floor(Math.random() * colors.length)];
+        const size = Math.floor(Math.random() * 10) + 5;
+        const posX = Math.random() * window.innerWidth;
+        const delay = Math.random() * 2;
+        
+        confetti.style.left = `${posX}px`;
+        confetti.style.top = "-10px";
+        confetti.style.backgroundColor = color;
+        confetti.style.width = `${size}px`;
+        confetti.style.height = `${size}px`;
+        confetti.style.borderRadius = Math.random() > 0.5 ? "50%" : "0";
+        
+        container.appendChild(confetti);
+        
+        const animation = confetti.animate([
+          { transform: `translateY(0) rotate(0deg)`, opacity: 1 },
+          { transform: `translateY(${window.innerHeight}px) rotate(${Math.random() * 360}deg)`, opacity: 0 }
+        ], {
+          duration: Math.random() * 3000 + 2000,
+          easing: "cubic-bezier(0.1, 0.8, 0.3, 1)",
+          delay: delay * 1000
+        });
+        
+        animation.onfinish = () => {
+          confetti.remove();
+        };
+      }
     }
 
     // 初始绘制
     drawWheel();
+    updateHistoryDisplay();
   </script>
 </body>
 </html>
