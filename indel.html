@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>自定义抽奖大转盘</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Microsoft YaHei', sans-serif;
+        }
+        
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            color: #fff;
+            padding: 20px;
+        }
+        
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            max-width: 1200px;
+            width: 100%;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        
+        .main-content {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 40px;
+            width: 100%;
+        }
+        
+        .wheel-container {
+            position: relative;
+            width: 400px;
+            height: 400px;
+        }
+        
+        #wheel {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+            transition: transform 4s cubic-bezier(0.17, 0.67, 0.83, 0.67);
+        }
+        
+        .wheel-pointer {
+            position: absolute;
+            top: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 50px;
+            background-color: #ff4757;
+            clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+            z-index: 10;
+        }
+        
+        .controls {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            width: 300px;
+        }
+        
+        .draw-button {
+            padding: 15px 40px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: white;
+            background: linear-gradient(to right, #ff4757, #ff3742);
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(255, 71, 87, 0.4);
+            transition: all 0.3s ease;
+        }
+        
+        .draw-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(255, 71, 87, 0.6);
+        }
+        
+        .draw-button:disabled {
+            background: #cccccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .result-container {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            width: 100%;
+            text-align: center;
+            backdrop-filter: blur(10px);
+        }
+        
+        .result-title {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+        }
+        
+        #result {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #ffdd59;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .custom-panel {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            width: 100%;
+            margin-top: 20px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .panel-title {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .prize-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        label {
+            font-weight: bold;
+        }
+        
+        input, select {
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            background: rgba(255, 255, 255, 0.9);
+        }
+        
+        .color-input {
+            height: 40px;
+        }
+        
+        .add-button {
+            padding: 10px;
+            background: #4CD6B6;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        
+        .prizes-list {
+            margin-top: 20px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        .prize-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            align-items: center;
+        }
+        
+        .prize-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .color-box {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+        }
+        
+        .delete-button {
+            background: #ff4757;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+        
+        .session-id {
+            margin-top: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 10px 20px;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            backdrop-filter: blur(10px);
+        }
+        
+        .instructions {
+            margin-top: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 15px;
+            width: 100%;
+            max-width: 800px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .instructions h2 {
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .instructions p {
+            margin-bottom: 10px;
+            line-height: 1.5;
+        }
+        
+        @media (max-width: 768px) {
+            .main-content {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .wheel-container {
+                width: 300px;
+                height: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>自定义抽奖大转盘</h1>
+            <p class="subtitle">自定义奖项内容，每人都有独立抽奖结果</p>
+        </header>
+        
+        <div class="main-content">
+            <div class="wheel-container">
+                <div class="wheel-pointer"></div>
+                <canvas id="wheel" width="400" height="400"></canvas>
+            </div>
+            
+            <div class="controls">
+                <button class="draw-button" id="draw-button">开始抽奖</button>
+                
+                <div class="result-container">
+                    <div class="result-title">抽奖结果</div>
+                    <div id="result">等待抽奖...</div>
+                </div>
+                
+                <div class="custom-panel">
+                    <div class="panel-title">自定义奖项</div>
+                    <div class="prize-form">
+                        <div class="form-group">
+                            <label for="prize-name">奖项名称</label>
+                            <input type="text" id="prize-name" placeholder="例如：一等奖">
+                        </div>
+                        <div class="form-group">
+                            <label for="prize-probability">概率（%）</label>
+                            <input type="number" id="prize-probability" min="1" max="100" placeholder="1-100">
+                        </div>
+                        <div class="form-group">
+                            <label for="prize-color">颜色</label>
+                            <input type="color" id="prize-color" class="color-input" value="#ff4757">
+                        </div>
+                        <button class="add-button" id="add-prize">添加奖项</button>
+                    </div>
+                    
+                    <div class="prizes-list" id="prizes-list">
+                        <!-- 奖项列表将由JavaScript动态生成 -->
+                    </div>
+                </div>
+                
+                <div class="session-id">
+                    您的会话ID: <span id="session-id"></span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="instructions">
+            <h2>如何获取网页链接</h2>
+            <p>1. 如果您在本地查看此页面，浏览器地址栏中的URL就是网页链接（以file://开头）</p>
+            <p>2. 要让他人通过网络访问，您需要将此网页部署到服务器：</p>
+            <p>&nbsp;&nbsp;- 将HTML文件上传到虚拟主机、GitHub Pages或Netlify等托管服务</p>
+            <p>&nbsp;&nbsp;- 使用Python简单服务器：在文件所在目录运行<code>python -m http.server 8000</code>，然后通过http://localhost:8000访问</p>
+            <p>&nbsp;&nbsp;- 使用Node.js的http-server：安装后运行<code>http-server</code>，然后按提示访问</p>
+            <p>3. 部署后，您可以将您的服务器URL分享给其他人</p>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const canvas = document.getElementById('wheel');
+            const ctx = canvas.getContext('2d');
+            const drawButton = document.getElementById('draw-button');
+            const resultElement = document.getElementById('result');
+            const sessionIdElement = document.getElementById('session-id');
+            const prizeNameInput = document.getElementById('prize-name');
+            const prizeProbabilityInput = document.getElementById('prize-probability');
+            const prizeColorInput = document.getElementById('prize-color');
+            const addPrizeButton = document.getElementById('add-prize');
+            const prizesList = document.getElementById('prizes-list');
+            
+            // 生成或获取会话ID
+            let sessionId = localStorage.getItem('lottery_sessionId');
+            if (!sessionId) {
+                sessionId = 'user_' + Math.random().toString(36).substr(2, 9);
+                localStorage.setItem('lottery_sessionId', sessionId);
+            }
+            sessionIdElement.textContent = sessionId;
+            
+            // 从本地存储加载自定义奖项，如果没有则使用默认奖项
+            let prizes = JSON.parse(localStorage.getItem('custom_prizes_' + sessionId)) || [
+                { text: "谢谢参与", color: "#FF9F40", probability: 30 },
+                { text: "优惠券10元", color: "#36BDCB", probability: 25 },
+                { text: "优惠券20元", color: "#4CD6B6", probability: 20 },
+                { text: "优惠券50元", color: "#D9586C", probability: 15 },
+                { text: "一等奖", color: "#FF4757", probability: 5 },
+                { text: "幸运奖", color: "#FFDD59", probability: 5 }
+            ];
+            
+            // 更新奖项列表显示
+            updatePrizesList();
+            
+            // 绘制转盘
+            function drawWheel() {
+                const centerX = canvas.width / 2;
+                const centerY = canvas.height / 2;
+                const radius = centerX - 10;
+                
+                // 清除画布
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                // 计算总概率
+                const totalProbability = prizes.reduce((sum, prize) => sum + prize.probability, 0);
+                
+                let startAngle = 0;
+                
+                // 绘制扇形
+                prizes.forEach(prize => {
+                    const sliceAngle = 2 * Math.PI * prize.probability / totalProbability;
+                    
+                    ctx.beginPath();
+                    ctx.moveTo(centerX, centerY);
+                    ctx.arc(centerX, centerY, radius, startAngle, startAngle + sliceAngle);
+                    ctx.closePath();
+                    ctx.fillStyle = prize.color;
+                    ctx.fill();
+                    
+                    // 绘制文本
+                    ctx.save();
+                    ctx.translate(centerX, centerY);
+                    ctx.rotate(startAngle + sliceAngle / 2);
+                    ctx.textAlign = 'right';
+                    ctx.fillStyle = '#000';
+                    ctx.font = '16px Arial';
+                    ctx.fillText(prize.text, radius - 20, 5);
+                    ctx.restore();
+                    
+                    startAngle += sliceAngle;
+                });
+                
+                // 绘制中心圆
+                ctx.beginPath();
+                ctx.arc(centerX, centerY, 20, 0, 2 * Math.PI);
+                ctx.fillStyle = '#fff';
+                ctx.fill();
+                ctx.strokeStyle = '#ccc';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+            }
+            
+            // 添加奖项
+            addPrizeButton.addEventListener('click', function() {
+                const name = prizeNameInput.value.trim();
+                const probability = parseInt(prizeProbabilityInput.value);
+                const color = prizeColorInput.value;
+                
+                if (!name) {
+                    alert('请输入奖项名称');
+                    return;
+                }
+                
+                if (isNaN(probability) || probability <= 0 || probability > 100) {
+                    alert('请输入有效的概率值（1-100）');
+                    return;
+                }
+                
+                // 添加新奖项
+                prizes.push({
+                    text: name,
+                    color: color,
+                    probability: probability
+                });
+                
+                // 保存到本地存储
+                localStorage.setItem('custom_prizes_' + sessionId, JSON.stringify(prizes));
+                
+                // 更新显示
+                updatePrizesList();
+                drawWheel();
+                
+                // 清空输入框
+                prizeNameInput.value = '';
+                prizeProbabilityInput.value = '';
+            });
+            
+            // 更新奖项列表显示
+            function updatePrizesList() {
+                prizesList.innerHTML = '';
+                
+                prizes.forEach((prize, index) => {
+                    const item = document.createElement('div');
+                    item.className = 'prize-item';
+                    item.innerHTML = `
+                        <div class="prize-info">
+                            <div class="color-box" style="background-color: ${prize.color}"></div>
+                            <span>${prize.text} (${prize.probability}%)</span>
+                        </div>
+                        <button class="delete-button" data-index="${index}">删除</button>
+                    `;
+                    prizesList.appendChild(item);
+                });
+                
+                // 添加删除事件监听
+                document.querySelectorAll('.delete-button').forEach(button => {
+                    button.addEventListener('click', function() {
+                        const index = parseInt(this.getAttribute('data-index'));
+                        prizes.splice(index, 1);
+                        localStorage.setItem('custom_prizes_' + sessionId, JSON.stringify(prizes));
+                        updatePrizesList();
+                        drawWheel();
+                    });
+                });
+            }
+            
+            // 抽奖函数
+            function drawLottery() {
+                // 禁用按钮防止重复点击
+                drawButton.disabled = true;
+                
+                // 生成随机数决定奖项
+                const random = Math.random() * 100;
+                let accumulatedProbability = 0;
+                let selectedPrize = null;
+                
+                for (const prize of prizes) {
+                    accumulatedProbability += prize.probability;
+                    if (random <= accumulatedProbability) {
+                        selectedPrize = prize;
+                        break;
+                    }
+                }
+                
+                // 计算旋转角度（多转几圈然后停在选中位置）
+                const prizeIndex = prizes.findIndex(p => p === selectedPrize);
+                const totalProbability = prizes.reduce((sum, prize) => sum + prize.probability, 0);
+                let startAngle = 0;
+                
+                for (let i = 0; i < prizeIndex; i++) {
+                    startAngle += 2 * Math.PI * prizes[i].probability / totalProbability;
+                }
+                
+                const sliceAngle = 2 * Math.PI * selectedPrize.probability / totalProbability;
+                const targetAngle = 2 * Math.PI * 5 - (startAngle + sliceAngle / 2); // 多转5圈然后停在目标位置
+                
+                // 应用旋转动画
+                canvas.style.transform = `rotate(${targetAngle}rad)`;
+                
+                // 动画结束后显示结果
+                setTimeout(() => {
+                    resultElement.textContent = selectedPrize.text;
+                    resultElement.style.color = selectedPrize.color;
+                    
+                    // 重新启用按钮
+                    drawButton.disabled = false;
+                }, 4000);
+            }
+            
+            // 初始化转盘
+            drawWheel();
+            
+            // 绑定抽奖按钮事件
+            drawButton.addEventListener('click', drawLottery);
+        });
+    </script>
+</body>
+</html>
