@@ -1,74 +1,120 @@
 <!DOCTYPE html>
-<html lang="zh">
+<html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>幸运大转盘</title>
+  <title>幸运大转盘与安全指南</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
     :root {
-      --primary-color: #ff4757;
-      --secondary-color: #5352ed;
-      --accent-color: #ffa502;
-      --light-color: #f1f2f6;
-      --dark-color: #2f3542;
-      --success-color: #2ed573;
+      --primary-color: #3498db;
+      --secondary-color: #2ecc71;
+      --accent-color: #e74c3c;
+      --dark-color: #2c3e50;
+      --light-color: #ecf0f1;
+      --background-gradient: linear-gradient(135deg, #1a2980, #26d0ce);
     }
     
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
     
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: #fff;
+      background: var(--background-gradient);
+      color: #333;
       min-height: 100vh;
       padding: 20px;
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
     }
     
     .container {
-      max-width: 1000px;
+      max-width: 1200px;
       width: 100%;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+      overflow: hidden;
+      margin-top: 20px;
     }
     
     header {
       text-align: center;
-      margin-bottom: 30px;
+      padding: 30px;
+      color: white;
+      background: var(--dark-color);
     }
     
     h1 {
       font-size: 2.8rem;
-      margin-bottom: 10px;
-      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+      margin-bottom: 15px;
     }
     
     .subtitle {
       font-size: 1.2rem;
       opacity: 0.9;
+      max-width: 800px;
+      margin: 0 auto;
+      line-height: 1.6;
     }
     
-    .main-content {
+    .tabs {
       display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 40px;
-      width: 100%;
+      background: var(--light-color);
+      border-bottom: 2px solid #ddd;
     }
     
+    .tab-button {
+      padding: 15px 30px;
+      background: none;
+      border: none;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+    
+    .tab-button:hover {
+      background: rgba(0, 0, 0, 0.05);
+    }
+    
+    .tab-button.active {
+      background: white;
+      color: var(--primary-color);
+      border-bottom: 3px solid var(--primary-color);
+    }
+    
+    .tab-content {
+      display: none;
+      padding: 30px;
+    }
+    
+    .tab-content.active {
+      display: block;
+    }
+    
+    /* 幸运大转盘样式 */
     .wheel-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 30px;
+    }
+    
+    .wheel-wrapper {
       position: relative;
       width: 400px;
       height: 400px;
+      margin: 20px 0;
     }
     
     #wheel {
@@ -97,15 +143,7 @@
       height: 0;
       border-left: 20px solid transparent;
       border-right: 20px solid transparent;
-      border-bottom: 50px solid var(--primary-color);
-    }
-    
-    .controls {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 20px;
-      width: 400px;
+      border-bottom: 50px solid var(--accent-color);
     }
     
     #spin-btn {
@@ -121,33 +159,23 @@
       display: flex;
       align-items: center;
       gap: 10px;
+      margin: 20px 0;
     }
     
     #spin-btn:hover {
-      background: #ff6b81;
+      background: #2980b9;
       transform: translateY(-3px);
       box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
     }
     
-    #spin-btn:active {
-      transform: translateY(1px);
-    }
-    
-    #spin-btn:disabled {
-      background: #ccc;
-      cursor: not-allowed;
-      transform: none;
-      box-shadow: none;
-    }
-    
     .result-container {
-      background: rgba(255, 255, 255, 0.1);
-      backdrop-filter: blur(10px);
+      background: rgba(52, 152, 219, 0.1);
       padding: 20px;
-      border-radius: 15px;
+      border-radius: 10px;
       width: 100%;
+      max-width: 400px;
       text-align: center;
-      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      margin-bottom: 20px;
     }
     
     #result {
@@ -159,19 +187,11 @@
     }
     
     .config-panel {
-      background: rgba(255, 255, 255, 0.1);
-      backdrop-filter: blur(10px);
+      background: var(--light-color);
       padding: 20px;
-      border-radius: 15px;
+      border-radius: 10px;
       width: 100%;
-      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-    }
-    
-    .config-panel h3 {
-      margin-bottom: 15px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
+      max-width: 400px;
     }
     
     #prizesInput {
@@ -179,16 +199,10 @@
       min-height: 120px;
       padding: 12px;
       border-radius: 8px;
-      border: 2px solid rgba(255, 255, 255, 0.2);
-      background: rgba(255, 255, 255, 0.1);
-      color: white;
+      border: 2px solid #ddd;
       font-size: 1rem;
       margin-bottom: 15px;
-    }
-    
-    #prizesInput:focus {
-      outline: none;
-      border-color: var(--secondary-color);
+      resize: vertical;
     }
     
     .buttons {
@@ -196,7 +210,7 @@
       gap: 10px;
     }
     
-    button {
+    .btn {
       padding: 10px 20px;
       border: none;
       border-radius: 5px;
@@ -206,79 +220,155 @@
     }
     
     .btn-primary {
-      background: var(--secondary-color);
+      background: var(--primary-color);
       color: white;
     }
     
     .btn-primary:hover {
-      background: #3742fa;
+      background: #2980b9;
     }
     
     .btn-secondary {
-      background: rgba(255, 255, 255, 0.2);
+      background: #95a5a6;
       color: white;
     }
     
     .btn-secondary:hover {
-      background: rgba(255, 255, 255, 0.3);
+      background: #7f8c8d;
     }
     
-    .history-panel {
-      background: rgba(255, 255, 255, 0.1);
-      backdrop-filter: blur(10px);
-      padding: 20px;
+    /* 安全指南样式 */
+    .security-dashboard {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 25px;
+    }
+    
+    .security-card {
+      background: white;
       border-radius: 15px;
-      width: 100%;
       box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-      margin-top: 20px;
-    }
-    
-    .history-list {
-      max-height: 200px;
-      overflow-y: auto;
-      margin-top: 15px;
-    }
-    
-    .history-item {
-      padding: 10px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 25px;
+      transition: transform 0.3s, box-shadow 0.3s;
       display: flex;
-      justify-content: space-between;
+      flex-direction: column;
+      border-left: 5px solid var(--primary-color);
     }
     
-    .history-item:last-child {
-      border-bottom: none;
+    .security-card.critical {
+      border-left-color: var(--accent-color);
     }
     
-    .confetti {
-      position: fixed;
-      width: 10px;
-      height: 10px;
-      background-color: var(--accent-color);
-      opacity: 0;
-      pointer-events: none;
+    .security-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
     }
     
-    @media (max-width: 900px) {
-      .main-content {
-        flex-direction: column;
-        align-items: center;
+    .card-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+    
+    .card-icon {
+      font-size: 2rem;
+      color: var(--primary-color);
+      margin-right: 15px;
+    }
+    
+    .critical .card-icon {
+      color: var(--accent-color);
+    }
+    
+    .card-title {
+      font-size: 1.3rem;
+      color: var(--dark-color);
+    }
+    
+    .card-content {
+      flex-grow: 1;
+      line-height: 1.6;
+      color: #444;
+      margin-bottom: 15px;
+    }
+    
+    .card-content ul {
+      padding-left: 20px;
+      margin: 10px 0;
+    }
+    
+    .card-content li {
+      margin-bottom: 8px;
+    }
+    
+    .code-example {
+      background: #2c3e50;
+      color: var(--light-color);
+      padding: 12px;
+      border-radius: 8px;
+      font-family: monospace;
+      font-size: 0.9rem;
+      overflow-x: auto;
+      margin: 10px 0;
+    }
+    
+    .status-indicator {
+      display: inline-block;
+      padding: 5px 10px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: bold;
+      margin-top: 10px;
+      background: var(--secondary-color);
+      color: white;
+    }
+    
+    .status-critical {
+      background: var(--accent-color);
+    }
+    
+    .status-warning {
+      background: #f39c12;
+    }
+    
+    .warning-banner {
+      background-color: rgba(231, 76, 60, 0.1);
+      border-left: 4px solid var(--accent-color);
+      padding: 20px;
+      margin: 30px 0;
+      border-radius: 4px;
+    }
+    
+    .warning-title {
+      color: var(--accent-color);
+      margin-bottom: 10px;
+      font-weight: 600;
+    }
+    
+    footer {
+      text-align: center;
+      padding: 20px;
+      color: white;
+      margin-top: 30px;
+    }
+    
+    @media (max-width: 768px) {
+      .wheel-wrapper {
+        width: 300px;
+        height: 300px;
       }
       
-      .wheel-container, .controls {
-        width: 100%;
-        max-width: 400px;
+      .security-dashboard {
+        grid-template-columns: 1fr;
       }
-    }
-    
-    @media (max-width: 480px) {
+      
       h1 {
         font-size: 2.2rem;
       }
       
-      .wheel-container {
-        width: 320px;
-        height: 320px;
+      .tab-button {
+        padding: 12px 15px;
+        font-size: 1rem;
       }
     }
   </style>
@@ -286,18 +376,28 @@
 <body>
   <div class="container">
     <header>
-      <h1><i class="fas fa-dharmachakra"></i> 幸运大转盘</h1>
-      <p class="subtitle">转动幸运，收获惊喜！</p>
+      <h1><i class="fas fa-shield-alt"></i> 幸运大转盘与安全指南</h1>
+      <p class="subtitle">享受幸运大转盘的乐趣，同时学习如何保护您的网站安全</p>
     </header>
     
-    <div class="main-content">
+    <div class="tabs">
+      <button class="tab-button active" data-tab="wheel">
+        <i class="fas fa-dharmachakra"></i> 幸运大转盘
+      </button>
+      <button class="tab-button" data-tab="security">
+        <i class="fas fa-lock"></i> 网站安全指南
+      </button>
+    </div>
+    
+    <!-- 幸运大转盘内容 -->
+    <div id="wheel-tab" class="tab-content active">
       <div class="wheel-container">
-        <div id="pointer"></div>
-        <canvas id="wheel" width="400" height="400"></canvas>
-      </div>
-      
-      <div class="controls">
-        <button id="spin-btn" onclick="spin()">
+        <div class="wheel-wrapper">
+          <div id="pointer"></div>
+          <canvas id="wheel" width="400" height="400"></canvas>
+        </div>
+        
+        <button id="spin-btn">
           <i class="fas fa-redo"></i> 开始抽奖
         </button>
         
@@ -310,43 +410,159 @@
           <h3><i class="fas fa-cog"></i> 奖品配置</h3>
           <textarea id="prizesInput" placeholder="每行输入一个奖品&#10;例如：&#10;一等奖：iPhone&#10;二等奖：AirPods&#10;谢谢参与"></textarea>
           <div class="buttons">
-            <button class="btn-primary" onclick="savePrizes()">保存配置</button>
-            <button class="btn-secondary" onclick="resetPrizes()">恢复默认</button>
+            <button class="btn btn-primary" id="savePrizes">保存配置</button>
+            <button class="btn btn-secondary" id="resetPrizes">恢复默认</button>
           </div>
         </div>
       </div>
     </div>
     
-    <div class="history-panel">
-      <h3><i class="fas fa-history"></i> 抽奖历史</h3>
-      <div class="history-list" id="historyList">
-        <!-- 历史记录将在这里显示 -->
+    <!-- 网站安全指南内容 -->
+    <div id="security-tab" class="tab-content">
+      <div class="security-dashboard">
+        <div class="security-card">
+          <div class="card-header">
+            <div class="card-icon">
+              <i class="fas fa-lock"></i>
+            </div>
+            <h2 class="card-title">HTTPS与SSL/TLS</h2>
+          </div>
+          <div class="card-content">
+            <p>确保您的网站使用HTTPS协议，并正确配置SSL/TLS证书：</p>
+            <ul>
+              <li>使用强加密算法（TLS 1.2或更高）</li>
+              <li>启用HSTS（HTTP严格传输安全）</li>
+              <li>定期更新SSL/TLS证书</li>
+              <li>使用CSP（内容安全策略）</li>
+            </ul>
+            <div class="code-example">
+              &lt;meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests"&gt;
+            </div>
+            <span class="status-indicator">已启用</span>
+          </div>
+        </div>
+        
+        <div class="security-card">
+          <div class="card-header">
+            <div class="card-icon">
+              <i class="fas fa-user-shield"></i>
+            </div>
+            <h2 class="card-title">身份验证与授权</h2>
+          </div>
+          <div class="card-content">
+            <p>加强用户身份验证和访问控制：</p>
+            <ul>
+              <li>实施强密码策略</li>
+              <li>启用多因素认证（MFA）</li>
+              <li>使用OAuth 2.0或OpenID Connect</li>
+              <li>实施最小权限原则</li>
+            </ul>
+            <div class="code-example">
+              // 密码强度验证示例
+              function validatePassword(password) {
+                return password.length >= 8 && 
+                  /[A-Z]/.test(password) && 
+                  /[a-z]/.test(password) && 
+                  /\d/.test(password);
+              }
+            </div>
+          </div>
+        </div>
+        
+        <div class="security-card critical">
+          <div class="card-header">
+            <div class="card-icon">
+              <i class="fas fa-bug"></i>
+            </div>
+            <h2 class="card-title">输入验证与过滤</h2>
+          </div>
+          <div class="card-content">
+            <p>防止注入攻击和XSS漏洞：</p>
+            <ul>
+              <li>对所有用户输入进行验证和清理</li>
+              <li>使用参数化查询防止SQL注入</li>
+              <li>对输出进行编码防止XSS攻击</li>
+              <li>实施CSRF保护令牌</li>
+            </ul>
+            <div class="code-example">
+              // XSS防护示例
+              function escapeHtml(unsafe) {
+                return unsafe.replace(/[&<"'>]/g, function(m) {
+                  return {'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[m];
+                });
+              }
+            </div>
+            <span class="status-indicator status-critical">需要立即处理</span>
+          </div>
+        </div>
+        
+        <div class="security-card">
+          <div class="card-header">
+            <div class="card-icon">
+              <i class="fas fa-database"></i>
+            </div>
+            <h2 class="card-title">数据保护与加密</h2>
+          </div>
+          <div class="card-content">
+            <p>保护敏感数据和用户隐私：</p>
+            <ul>
+              <li>加密存储敏感数据</li>
+              <li>使用安全的cookie（HttpOnly, Secure）</li>
+              <li>实施适当的会话管理</li>
+              <li>遵守GDPR和其他隐私法规</li>
+            </ul>
+            <div class="code-example">
+              // 设置安全Cookie
+              Set-Cookie: sessionId=abc123; HttpOnly; Secure; SameSite=Strict
+            </div>
+            <span class="status-indicator status-warning">需要改进</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="warning-banner">
+        <h3 class="warning-title"><i class="fas fa-exclamation-triangle"></i> 重要安全提醒</h3>
+        <p>网站安全是一个持续的过程，不是一次性的任务。请定期进行安全评估、漏洞扫描和渗透测试，保持所有软件组件更新，并教育用户关于安全最佳实践。</p>
       </div>
     </div>
   </div>
+  
+  <footer>
+    <p>© 2023 幸运大转盘与安全指南 | 提供娱乐与安全知识</p>
+  </footer>
 
   <script>
+    // 选项卡切换功能
+    document.querySelectorAll('.tab-button').forEach(button => {
+      button.addEventListener('click', () => {
+        // 移除所有active类
+        document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+        
+        // 添加active类到当前选项卡
+        button.classList.add('active');
+        const tabId = button.getAttribute('data-tab');
+        document.getElementById(`${tabId}-tab`).classList.add('active');
+      });
+    });
+    
+    // 幸运大转盘功能
     const canvas = document.getElementById("wheel");
     const ctx = canvas.getContext("2d");
     const resultElement = document.getElementById("result");
     const prizesInput = document.getElementById("prizesInput");
     const spinBtn = document.getElementById("spin-btn");
-    const historyList = document.getElementById("historyList");
+    const savePrizesBtn = document.getElementById("savePrizes");
+    const resetPrizesBtn = document.getElementById("resetPrizes");
 
     // 默认奖品
     let prizes = ["一等奖", "二等奖", "三等奖", "四等奖", "五等奖", "六等奖"];
     let currentRotation = 0;
     let isSpinning = false;
-    let spinHistory = [];
 
-    // 从本地存储读取配置和历史
+    // 从本地存储读取配置
     if(localStorage.getItem("prizes")){
       prizes = JSON.parse(localStorage.getItem("prizes"));
-    }
-    
-    if(localStorage.getItem("spinHistory")){
-      spinHistory = JSON.parse(localStorage.getItem("spinHistory"));
-      updateHistoryDisplay();
     }
     
     prizesInput.value = prizes.join("\n");
@@ -372,7 +588,7 @@
       ctx.fillStyle = "rgba(255, 255, 255, 0.1)";
       ctx.fill();
       ctx.lineWidth = 2;
-      ctx.strokeStyle = "rgba(255, 255, 255, 0.3)";
+      ctx.strokeStyle = "rgba(0, 0, 0, 0.2)";
       ctx.stroke();
 
       // 绘制每个扇区
@@ -425,22 +641,11 @@
       canvas.style.transition = "transform 4s cubic-bezier(0.17, 0.67, 0.21, 0.99)";
       canvas.style.transform = `rotate(${currentRotation}deg)`;
       
-      // 添加音效（简单版本）
-      const spinSound = new Audio("data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF5fdJivrJBhNjVgodDbq2EcBStztvLNjEMTACRuve/IfDULAB1sv/LMeC8JABlqvfLNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMABZou/LNeTMMAB极简版音效，实际应用中可替换为真实音效");
-      spinSound.play();
-      
       // 显示结果
       setTimeout(() => {
         const prize = prizes[randomIndex];
         resultElement.textContent = prize;
-        resultElement.style.fontSize = "1.8rem";
-        resultElement.style.color = "#ffdd59";
-        
-        // 添加到历史记录
-        addToHistory(prize);
-        
-        // 创建庆祝效果
-        createConfetti();
+        resultElement.style.color = "#e74c3c";
         
         isSpinning = false;
         spinBtn.disabled = false;
@@ -459,14 +664,9 @@
       drawWheel();
       
       // 显示保存成功提示
-      const saveBtn = document.querySelector('.btn-primary');
-      const originalText = saveBtn.textContent;
-      saveBtn.textContent = "保存成功！";
-      saveBtn.style.background = "var(--success-color)";
-      
+      savePrizesBtn.textContent = "保存成功！";
       setTimeout(() => {
-        saveBtn.textContent = originalText;
-        saveBtn.style.background = "";
+        savePrizesBtn.textContent = "保存配置";
       }, 1500);
     }
 
@@ -477,94 +677,19 @@
       drawWheel();
       
       // 显示重置成功提示
-      const resetBtn = document.querySelector('.btn-secondary');
-      const originalText = resetBtn.textContent;
-      resetBtn.textContent = "已重置！";
-      resetBtn.style.background = "var(--success-color)";
-      
+      resetPrizesBtn.textContent = "已重置！";
       setTimeout(() => {
-        resetBtn.textContent = originalText;
-        resetBtn.style.background = "";
+        resetPrizesBtn.textContent = "恢复默认";
       }, 1500);
     }
 
-    function addToHistory(prize) {
-      const now = new Date();
-      const timeString = now.toLocaleTimeString();
-      
-      spinHistory.unshift({
-        prize: prize,
-        time: timeString
-      });
-      
-      // 只保留最近10条记录
-      if (spinHistory.length > 10) {
-        spinHistory.pop();
-      }
-      
-      localStorage.setItem("spinHistory", JSON.stringify(spinHistory));
-      updateHistoryDisplay();
-    }
-
-    function updateHistoryDisplay() {
-      historyList.innerHTML = "";
-      
-      if (spinHistory.length === 0) {
-        historyList.innerHTML = "<div class='history-item'>暂无记录</div>";
-        return;
-      }
-      
-      spinHistory.forEach(item => {
-        const historyItem = document.createElement("div");
-        historyItem.className = "history-item";
-        historyItem.innerHTML = `
-          <span>${item.prize}</span>
-          <span>${item.time}</span>
-        `;
-        historyList.appendChild(historyItem);
-      });
-    }
-
-    function createConfetti() {
-      const confettiCount = 100;
-      const container = document.body;
-      
-      for (let i = 0; i < confettiCount; i++) {
-        const confetti = document.createElement("div");
-        confetti.className = "confetti";
-        
-        const color = colors[Math.floor(Math.random() * colors.length)];
-        const size = Math.floor(Math.random() * 10) + 5;
-        const posX = Math.random() * window.innerWidth;
-        const delay = Math.random() * 2;
-        
-        confetti.style.left = `${posX}px`;
-        confetti.style.top = "-10px";
-        confetti.style.backgroundColor = color;
-        confetti.style.width = `${size}px`;
-        confetti.style.height = `${size}px`;
-        confetti.style.borderRadius = Math.random() > 0.5 ? "50%" : "0";
-        
-        container.appendChild(confetti);
-        
-        const animation = confetti.animate([
-          { transform: `translateY(0) rotate(0deg)`, opacity: 1 },
-          { transform: `translateY(${window.innerHeight}px) rotate(${Math.random() * 360}deg)`, opacity: 0 }
-        ], {
-          duration: Math.random() * 3000 + 2000,
-          easing: "cubic-bezier(0.1, 0.8, 0.3, 1)",
-          delay: delay * 1000
-        });
-        
-        animation.onfinish = () => {
-          confetti.remove();
-        };
-      }
-    }
+    // 添加事件监听器
+    spinBtn.addEventListener('click', spin);
+    savePrizesBtn.addEventListener('click', savePrizes);
+    resetPrizesBtn.addEventListener('click', resetPrizes);
 
     // 初始绘制
     drawWheel();
-    updateHistoryDisplay();
   </script>
 </body>
 </html>
